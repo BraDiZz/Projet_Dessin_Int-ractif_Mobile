@@ -39,7 +39,7 @@ public class HubActivity extends AppCompatActivity {
 
         btnMyDrawings.setOnClickListener(v -> {
             Intent intent = new Intent(HubActivity.this, DessinsActivity.class);
-            startActivity(intent); // Lance LoginActivity
+            startActivity(intent); // Lance LoginActivit
         });
     }
 }
