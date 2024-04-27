@@ -22,7 +22,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".BDD" />
         <activity android:name=".HubActivity" />
         <activity android:name=".InscriptionActivity" />
         <activity android:name=".Creation_dessin" />

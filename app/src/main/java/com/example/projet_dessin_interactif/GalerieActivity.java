@@ -20,7 +20,7 @@ public class GalerieActivity extends AppCompatActivity {
         setContentView(R.layout.activity_galerie);
 
         // Récupérer la référence à la TextView pour afficher les dessins
-        TextView Titre = findViewById(R.id.Titre);
+        TextView Titre = findViewById(R.id.recyclerView);
 
         // Récupérer les données des dessins depuis la base de données
         dbHelper = new BDD(this); // Initialiser votre classe BDD
