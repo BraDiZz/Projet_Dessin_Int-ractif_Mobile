@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HubActivity">
+
+    <!-- Aligner les boutons en chaîne pour centrer verticalement -->
+    <Button
+        android:id="@+id/btn_gallery"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Galerie"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintVertical_bias="0.4" />
+
+
+
+    <Button
+        android:id="@+id/btn_ongoing_drawings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Galerie des dessins en cours"
+        app:layout_constraintTop_toBottomOf="@id/btn_gallery"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5" />
+
+    <Button
+        android:id="@+id/btn_create_drawing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Créer un dessin"
+        app:layout_constraintTop_toBottomOf="@id/btn_ongoing_drawings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5" />
+
+    <Button
+        android:id="@+id/btn_my_drawings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mes dessins"
+        app:layout_constraintTop_toBottomOf="@id/btn_create_drawing"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".InscriptionActivity">
+
+    <TextView
+        android:id="@+id/email_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Adresse mail"
+        android:textSize="16sp" />
+
+    <!-- Champ pour Adresse mail -->
+    <EditText
+        android:id="@+id/email_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
+
+    <TextView
+        android:id="@+id/pseudo_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pseudo"
+        android:textSize="16sp"
+        android:layout_marginTop="24dp" />
+
+
+    <EditText
+        android:id="@+id/pseudo_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp" />
+
+
+    <TextView
+        android:id="@+id/password_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mot de passe"
+        android:textSize="16sp"
+        android:layout_marginTop="24dp" />
+
+    <!-- Champ pour Mot de passe -->
+    <EditText
+        android:id="@+id/password_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/password_verif_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Confirmez Mot de passe"
+        android:textSize="16sp"
+        android:layout_marginTop="24dp" />
+
+    <!-- Champ pour Mot de passe -->
+    <EditText
+        android:id="@+id/password_verif_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:layout_marginTop="8dp" />
+
+    <Button
+        android:id="@+id/buttonsimple"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Compte classique"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/buttonprenium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Compte Prenium"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/buttonInscrire"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="S'inscrire'"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>
