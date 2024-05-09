@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.content.Intent;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class Creation_dessin extends AppCompatActivity {
         TextView adresse_label = findViewById(R.id.adresse_label);
         EditText adresse_collaborateurs = findViewById(R.id.adresse_collaborateurs);
         Button btnAjouter = findViewById(R.id.btn_ajouter);
+        Button btnCreate = findViewById(R.id.btn_create);
 
         //int selectedId = radioGroup.getCheckedRadioButtonId();
 
@@ -60,6 +62,11 @@ public class Creation_dessin extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Entrez un nom valide", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        btnCreate.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ViewDrawingActivity.class); // Classe du canvas
+            startActivity(intent); // Démarrer l'activité du dessin
         });
     }
 }
