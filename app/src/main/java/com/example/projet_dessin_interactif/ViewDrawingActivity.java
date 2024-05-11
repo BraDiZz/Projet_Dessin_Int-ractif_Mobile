@@ -5,10 +5,12 @@ import android.view.View;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
+
 public class ViewDrawingActivity extends AppCompatActivity {
 
     private DrawingView drawingView;
-
+    private boolean isCircleMode = false;
+    private boolean isStraightLineMode = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,6 +18,23 @@ public class ViewDrawingActivity extends AppCompatActivity {
 
         // Obtenir une référence à la vue de dessin
         drawingView = findViewById(R.id.drawingView);
+
+        Button modeCircleButton = findViewById(R.id.CircleModeButton);
+        modeCircleButton.setOnClickListener(v -> {
+            drawingView.setCircleMode(); // Activer ou désactiver le mode cercle dans la vue de dessin
+        });
+
+        Button modeStraightLineButton = findViewById(R.id.LineModeButton);
+        modeStraightLineButton.setOnClickListener(v -> {
+            drawingView.setStraightLineMode(); // Activer ou désactiver le mode cercle dans la vue de dessin
+        });
+
+        Button modeNormalButton = findViewById(R.id.NormalModeButton);
+        modeNormalButton.setOnClickListener(v -> {
+            drawingView.setNormalMode(); // Activer ou désactiver le mode cercle dans la vue de dessin
+        });
+
+
 
         // Configurer le bouton "clear"
         Button clearButton = findViewById(R.id.clearButton);
@@ -26,6 +45,8 @@ public class ViewDrawingActivity extends AppCompatActivity {
             }
         });
 
+
+
         // Configurer le bouton "save"
         Button saveButton = findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -34,6 +55,8 @@ public class ViewDrawingActivity extends AppCompatActivity {
                 // Ajoutez ici la logique de sauvegarde du dessin
             }
         });
+
+
     }
 }
 

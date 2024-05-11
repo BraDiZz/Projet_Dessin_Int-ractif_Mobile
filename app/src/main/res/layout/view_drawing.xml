@@ -12,6 +12,34 @@
         android:layout_height="match_parent"
         android:background="@android:color/white"/>
 
+    <Button
+        android:id="@+id/CircleModeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mode Cercle"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"/>
+
+    <Button
+        android:id="@+id/NormalModeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mode Normal"
+        android:layout_below="@id/CircleModeButton"
+        />
+
+    <Button
+        android:id="@+id/LineModeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mode Ligne Droite"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"/>
+
+
+
+
+
     <!-- Bouton "clear" -->
     <Button
         android:id="@+id/clearButton"
