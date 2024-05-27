@@ -13,16 +13,20 @@ import java.util.List;
 import android.view.View;
 
 public class DrawingView extends View {
-    private List<PointF> circlePositions = new ArrayList<>();
-    private Path path;
+    private List<Circle> circles = new ArrayList<>();
+    private List<Line> lines = new ArrayList<>();
+    private List<PathWithPaint> paths = new ArrayList<>();
+
+
+    private Path currentPath;
+    private Paint currentPaint;
+    private float currentStrokeWidth = 10f;
+
     private boolean isNormalMode = false;
     private boolean isCircleMode = false;
     private boolean isStraightLineMode = false; // Indicateur pour le mode "ligne droite"
     private PointF startPoint; // Point de départ pour la ligne droite
     private PointF endPoint; // Point de fin pour la ligne droite
-    private float touchX;
-    private float touchY;
-    private Paint paint;
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -30,62 +34,73 @@ public class DrawingView extends View {
     }
 
     private void init() {
-        path = new Path();
-        paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(10f);
-        paint.setAntiAlias(true);
+        currentPath = new Path();
+        currentPaint = new Paint();
+        currentPaint.setColor(Color.BLACK);
+        currentPaint.setStyle(Paint.Style.STROKE);
+        setBackgroundColor(Color.WHITE);
+        currentPaint.setStrokeWidth(currentStrokeWidth);
+        currentPaint.setAntiAlias(true);
         isCircleMode = false;
         isNormalMode = true;
         isStraightLineMode = false;
     }
-
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // Dessiner les cercles si le mode cercle est activé
-        if (isCircleMode) {
-            paint.setStyle(Paint.Style.FILL); // Remplir les cercles
-            for (PointF position : circlePositions) {
-                canvas.drawCircle(position.x, position.y, 50f, paint); // Dessiner chaque cercle à partir de la liste
-            }
+        for (Circle circle : circles) {
+            circle.paint.setStyle(Paint.Style.FILL);
+            canvas.drawCircle(circle.position.x, circle.position.y, circle.radius, circle.paint);
         }
 
-        // Dessiner les lignes droites si le mode ligne droite est activé
-        if (isStraightLineMode) {
-            if (startPoint != null && endPoint != null) {
-                canvas.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, paint); // Dessiner une ligne droite entre startPoint et endPoint
-            }
+        for (Line line : lines) {
+            line.paint.setStyle(Paint.Style.STROKE);
+            canvas.drawLine(line.startPoint.x, line.startPoint.y, line.endPoint.x, line.endPoint.y, line.paint);
         }
 
-        // Dessiner les lignes si le mode normal est activé
+        for (PathWithPaint pathWithPaint : paths) {
+            pathWithPaint.paint.setStyle(Paint.Style.STROKE);
+            canvas.drawPath(pathWithPaint.path, pathWithPaint.paint);
+        }
+
+        if (isStraightLineMode && startPoint != null && endPoint != null) {
+            currentPaint.setStyle(Paint.Style.STROKE);
+            canvas.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, currentPaint);
+        }
+
         if (isNormalMode) {
-            canvas.drawPath(path, paint); // Dessiner une ligne
+            currentPaint.setStyle(Paint.Style.STROKE);
+            canvas.drawPath(currentPath, currentPaint);
         }
     }
 
-
-
-    // Méthode pour activer ou désactiver le mode cercle
+    // Méthode pour activer le mode cercle
     public void setCircleMode() {
         isCircleMode = true;
         isNormalMode = false;
         isStraightLineMode = false;
     }
+
+    // Méthode pour activer le mode normal
     public void setNormalMode() {
         isCircleMode = false;
         isNormalMode = true;
         isStraightLineMode = false;
     }
+
+    // Méthode pour activer le mode ligne droite
     public void setStraightLineMode() {
         isCircleMode = false;
         isNormalMode = false;
         isStraightLineMode = true;
     }
 
+    public void setStrokeWidth(float strokeWidth) {
+        currentStrokeWidth = strokeWidth;
+        currentPaint.setStrokeWidth(strokeWidth);
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -95,40 +110,80 @@ public class DrawingView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 if (isStraightLineMode) {
-                    startPoint = new PointF(x, y); // Enregistrer le point de départ pour la ligne droite
-                } else if (!isCircleMode) {
-                    path.moveTo(x, y); // Commencer un nouveau chemin si le mode cercle n'est pas activé
+                    startPoint = new PointF(x, y);
+                    endPoint = startPoint;
+                } else if (isCircleMode) {
+                    circles.add(new Circle(new PointF(x, y), currentStrokeWidth+10, new Paint(currentPaint)));
+                } else {
+                    currentPath.moveTo(x, y);
                 }
                 return true;
             case MotionEvent.ACTION_MOVE:
                 if (isStraightLineMode) {
-                    // Ne rien faire pendant le déplacement pour la ligne droite
+                    endPoint = new PointF(x, y);
                 } else if (!isCircleMode) {
-                    path.lineTo(x, y); // Dessiner une ligne si le mode cercle n'est pas activé
+                    currentPath.lineTo(x, y);
                 }
                 break;
             case MotionEvent.ACTION_UP:
                 if (isStraightLineMode) {
-                    endPoint = new PointF(x, y); // Enregistrer le point de fin pour la ligne droite
+                    endPoint = new PointF(x, y);
+                    lines.add(new Line(startPoint, endPoint, new Paint(currentPaint)));
                 } else if (isCircleMode) {
-                    circlePositions.add(new PointF(x, y)); // Ajouter les coordonnées du cercle actuellement dessiné à la liste
+                    // Cercle déjà ajouté dans ACTION_DOWN
+                } else {
+                    paths.add(new PathWithPaint(new Path(currentPath), new Paint(currentPaint)));
+                    currentPath.reset();
                 }
                 break;
             default:
                 return false;
         }
 
-        invalidate(); // Redessiner la vue pour afficher la ligne
-
+        invalidate();
         return true;
     }
 
-
-
-
-
     public void clearDrawing() {
-        path.reset(); // Efface le dessin
-        invalidate(); // Redessine la vue
+        circles.clear();
+        lines.clear();
+        paths.clear();
+        startPoint = null;
+        endPoint = null;
+        invalidate();
+    }
+
+    private static class Line {
+        PointF startPoint;
+        PointF endPoint;
+        Paint paint;
+
+        Line(PointF startPoint, PointF endPoint, Paint paint) {
+            this.startPoint = startPoint;
+            this.endPoint = endPoint;
+            this.paint = paint;
+        }
+    }
+
+    private static class PathWithPaint {
+        Path path;
+        Paint paint;
+
+        PathWithPaint(Path path, Paint paint) {
+            this.path = path;
+            this.paint = paint;
+        }
+    }
+
+    private static class Circle {
+        PointF position;
+        float radius;
+        Paint paint;
+
+        Circle(PointF position, float radius, Paint paint) {
+            this.position = position;
+            this.radius = radius;
+            this.paint = paint;
+        }
     }
 }

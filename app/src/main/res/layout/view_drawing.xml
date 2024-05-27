@@ -1,61 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Vue de dessin -->
+    <LinearLayout
+        android:id="@+id/buttonLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/CircleModeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mode Cercle" />
+
+        <Button
+            android:id="@+id/NormalModeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mode Normal" />
+
+        <Button
+            android:id="@+id/LineModeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mode Ligne Droite" />
+    </LinearLayout>
+
     <com.example.projet_dessin_interactif.DrawingView
         android:id="@+id/drawingView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/white"/>
+        android:layout_below="@id/buttonLayout"
+        android:layout_above="@id/controlLayout"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp" />
 
-    <Button
-        android:id="@+id/CircleModeButton"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/controlLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Mode Cercle"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"/>
-
-    <Button
-        android:id="@+id/NormalModeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mode Normal"
-        android:layout_below="@id/CircleModeButton"
-        />
-
-    <Button
-        android:id="@+id/LineModeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mode Ligne Droite"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"/>
-
-
-
-
-
-    <!-- Bouton "clear" -->
-    <Button
-        android:id="@+id/clearButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Clear"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"/>
+        android:padding="16dp">
 
-    <!-- Bouton "save" -->
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"/>
+        <Button
+            android:id="@+id/clearButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear"
+            android:layout_alignParentStart="true"/>
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:max="50"
+            android:layout_toEndOf="@id/clearButton"
+            android:layout_toStartOf="@id/saveButton"
+            android:layout_centerVertical="true"
+            android:layout_marginHorizontal="16dp" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:layout_alignParentEnd="true"/>
+    </RelativeLayout>
 
 </RelativeLayout>
+

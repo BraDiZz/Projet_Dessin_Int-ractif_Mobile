@@ -3,6 +3,7 @@ package com.example.projet_dessin_interactif;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 
@@ -18,6 +19,22 @@ public class ViewDrawingActivity extends AppCompatActivity {
 
         // Obtenir une référence à la vue de dessin
         drawingView = findViewById(R.id.drawingView);
+
+        SeekBar seekBar = findViewById(R.id.seekBar);
+
+        // Configuration du SeekBar
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                drawingView.setStrokeWidth(progress); // Mettre à jour l'épaisseur du trait
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
         Button modeCircleButton = findViewById(R.id.CircleModeButton);
         modeCircleButton.setOnClickListener(v -> {
