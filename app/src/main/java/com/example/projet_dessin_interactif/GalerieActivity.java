@@ -14,7 +14,7 @@ public class GalerieActivity extends AppCompatActivity {
 
     private BDD dbHelper;
     private RecyclerView recyclerView;
-    private DessinAdapter adapter;
+    private DessinAdapter_classique adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class GalerieActivity extends AppCompatActivity {
 
         dbHelper = new BDD(this);
         List<DessinModel> dessinsList = getDessins();
-        adapter = new DessinAdapter(dessinsList); // Appeler le constructeur avec un seul paramètre
+        adapter = new DessinAdapter_classique(dessinsList); // Appeler le constructeur avec un seul paramètre
         recyclerView.setAdapter(adapter);
     }
 
@@ -37,7 +37,7 @@ public class GalerieActivity extends AppCompatActivity {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT " + BDD.COLUMN_DESSIN_NOM + ", " + BDD.COLUMN_PSEUDO + ", " + BDD.COLUMN_DESSIN_IMAGE +
+        String query = "SELECT " + BDD.COLUMN_DESSIN_ID + ", " + BDD.COLUMN_DESSIN_NOM + ", " + BDD.COLUMN_PSEUDO + ", "  + BDD.COLUMN_DESSIN_IMAGE +
                 " FROM " + BDD.TABLE_DESSIN + " INNER JOIN " + BDD.TABLE_NAME +
                 " ON " + BDD.TABLE_DESSIN + "." + BDD.COLUMN_CREATEUR_ID + " = " +
                 BDD.TABLE_NAME + "." + BDD.COLUMN_ID +
@@ -49,8 +49,10 @@ public class GalerieActivity extends AppCompatActivity {
             do {
                 String nomDessin = cursor.getString(cursor.getColumnIndex(BDD.COLUMN_DESSIN_NOM));
                 String auteur = cursor.getString(cursor.getColumnIndex(BDD.COLUMN_PSEUDO));
+                long acc_id = cursor.getLong(cursor.getColumnIndex(BDD.COLUMN_DESSIN_ID));
                 byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(BDD.COLUMN_DESSIN_IMAGE)); // Récupérer l'image en BLOB
-                dessinsList.add(new DessinModel(nomDessin, auteur, imageBytes));
+
+                dessinsList.add(new DessinModel(nomDessin, auteur, imageBytes,acc_id));
             } while (cursor.moveToNext());
             cursor.close(); // Fermer le curseur après utilisation
         }

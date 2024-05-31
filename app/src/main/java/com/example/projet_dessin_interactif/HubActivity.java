@@ -17,21 +17,24 @@ public class HubActivity extends AppCompatActivity {
         dbHelper = new BDD(this);
         // Références des boutons
         Button btnGallery = findViewById(R.id.btn_gallery);
-        Button btnOngoingDrawings = findViewById(R.id.btn_ongoing_drawings);
         Button btnCreateDrawing = findViewById(R.id.btn_create_drawing);
         Button btnMyDrawings = findViewById(R.id.btn_my_drawings);
         Button btnDeco = findViewById(R.id.btn_deconnexion);
 
         // Gérer les clics sur les boutons
         btnGallery.setOnClickListener(v -> {
-            Intent intent = new Intent(HubActivity.this, GalerieActivity.class);
-            startActivity(intent); // Lance LoginActivity
+            int acc=dbHelper.getTypeAccount();
+            if(acc==1){
+                Intent intent = new Intent(HubActivity.this, GalerieActivity.class);
+                startActivity(intent); // Lance LoginActivity
+            }
+            if(acc==2){
+                Intent intent = new Intent(HubActivity.this, GalerieActivity_prenium.class);
+                startActivity(intent); // Lance LoginActivity
+            }
+
         });
 
-        btnOngoingDrawings.setOnClickListener(v -> {
-            Intent intent = new Intent(HubActivity.this, GalerieCouranteActivity.class);
-            startActivity(intent); // Lance LoginActivity
-        });
 
         btnCreateDrawing.setOnClickListener(v -> {
             Intent intent = new Intent(HubActivity.this, Creation_dessin.class);  // Crée un Intent

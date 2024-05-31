@@ -30,7 +30,7 @@ public class BDD extends SQLiteOpenHelper {
     private static final int[] INITIAL_CREATEUR = {1,2,1};
 
     private static final String DATABASE_NAME = "DataBase";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
 
     // Table names and columns
     public static final String TABLE_NAME = "utilisateurs";
@@ -190,6 +190,43 @@ public class BDD extends SQLiteOpenHelper {
         return connected;
     }
 
+    public int getTypeAccount() {
+        // Récupérer l'ID de l'utilisateur connecté
+        int userId = getConnectedUserId();
+
+        // Vérifier si l'utilisateur est connecté
+        if (userId != -1) {
+            SQLiteDatabase db = this.getReadableDatabase();
+            Cursor cursor = null;
+
+            try {
+                // Requête pour obtenir le type de compte de l'utilisateur connecté
+                String query = "SELECT " + COLUMN_ACCOUNT_TYPE +
+                        " FROM " + TABLE_NAME +
+                        " WHERE " + COLUMN_ID + " = ?";
+                cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
+
+                // Vérifier si le curseur contient des données
+                if (cursor != null && cursor.moveToFirst()) {
+                    // Récupérer le type de compte de l'utilisateur
+                    int accountType = cursor.getInt(cursor.getColumnIndex(COLUMN_ACCOUNT_TYPE));
+                    return accountType;
+                }
+            } catch (Exception e) {
+                e.printStackTrace(); // Journaliser l'exception pour le débogage
+            } finally {
+                if (cursor != null) {
+                    cursor.close(); // Fermer le curseur après utilisation
+                }
+                db.close(); // Fermer la connexion à la base de données
+            }
+        }
+
+        // Si aucun utilisateur n'est connecté ou si une erreur s'est produite, retourner -1
+        return -1;
+    }
+
+
     public static void deconnexion(){
         connected = -1;
     }
@@ -248,10 +285,67 @@ public class BDD extends SQLiteOpenHelper {
             values.put(COLUMN_ACCOUNT_TYPE,ACCOUNT_TYPE_PREMIUM);
         }
 
-
         long result = db.insert(TABLE_NAME, null, values);
 
+        if (result != -1) {
+            // L'insertion a réussi, donc récupérer l'ID inséré
+            Cursor cursor = db.rawQuery("SELECT last_insert_rowid()", null);
+            if (cursor.moveToFirst()) {
+                connected = cursor.getInt(0); // Récupérer l'ID inséré
+            }
+            cursor.close();
+        }
         return result!=-1;
     }
+
+    public Bitmap downloadImage(long dessinId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Bitmap bitmap = null;
+
+        try {
+            // Requête pour sélectionner l'image à partir de l'ID du dessin
+            String query = "SELECT " + COLUMN_DESSIN_IMAGE +
+                    " FROM " + TABLE_DESSIN +
+                    " WHERE " + COLUMN_DESSIN_ID + " = ?";
+            Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(dessinId)});
+
+            // Vérifier si le curseur contient des données
+            if (cursor != null && cursor.moveToFirst()) {
+                // Récupérer l'image en tant que tableau de bytes
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(COLUMN_DESSIN_IMAGE));
+                if (imageBytes != null) {
+                    // Convertir le tableau de bytes en bitmap
+                    bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Journaliser l'exception pour le débogage
+        } finally {
+            db.close(); // Fermer la connexion à la base de données
+        }
+
+        return bitmap;
+    }
+
+    public Bitmap getDessinImage(long dessinId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT " + COLUMN_DESSIN_IMAGE + " FROM " + TABLE_DESSIN +
+                " WHERE " + COLUMN_DESSIN_ID + " = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(dessinId)});
+
+        Bitmap image = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(COLUMN_DESSIN_IMAGE));
+            image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            cursor.close();
+        }
+
+        db.close();
+        return image;
+    }
+
+
 
 }

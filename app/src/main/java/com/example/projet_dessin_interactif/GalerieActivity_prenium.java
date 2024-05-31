@@ -10,40 +10,38 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DessinsActivity extends AppCompatActivity {
+public class GalerieActivity_prenium extends AppCompatActivity {
 
     private BDD dbHelper;
     private RecyclerView recyclerView;
-    private DessinAdapter adapter;
+    private DessinAdapter_prenium adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dessins);
+        setContentView(R.layout.activity_galerie);
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         dbHelper = new BDD(this);
         List<DessinModel> dessinsList = getDessins();
-        adapter = new DessinAdapter(dessinsList,DessinsActivity.this); // Appeler le constructeur avec un seul paramètre
+        adapter = new DessinAdapter_prenium(dessinsList,GalerieActivity_prenium.this); // Appeler le constructeur avec un seul paramètre
         recyclerView.setAdapter(adapter);
     }
 
 
-    // Méthode pour récupérer les dessins de l'utilisateur connecté depuis la base de données
+    // Méthode pour récupérer les dessins depuis la base de données
     private List<DessinModel> getDessins() {
         List<DessinModel> dessinsList = new ArrayList<>();
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        // Requête pour récupérer les dessins de l'utilisateur connecté uniquement
-        int connectedUserId = BDD.getConnectedUserId();
-        String query = "SELECT " + BDD.COLUMN_DESSIN_ID + ", " + BDD.COLUMN_DESSIN_NOM + ", " + BDD.COLUMN_PSEUDO + ", " + BDD.COLUMN_DESSIN_IMAGE +
+        String query = "SELECT " + BDD.COLUMN_DESSIN_ID + ", " + BDD.COLUMN_DESSIN_NOM + ", " + BDD.COLUMN_PSEUDO + ", "  + BDD.COLUMN_DESSIN_IMAGE +
                 " FROM " + BDD.TABLE_DESSIN + " INNER JOIN " + BDD.TABLE_NAME +
                 " ON " + BDD.TABLE_DESSIN + "." + BDD.COLUMN_CREATEUR_ID + " = " +
                 BDD.TABLE_NAME + "." + BDD.COLUMN_ID +
-                " WHERE " + BDD.COLUMN_CREATEUR_ID + " = " + connectedUserId;
+                " WHERE " + BDD.COLUMN_DESSIN_STATUT + " = 1"; // Utilisation de l'entier 1 pour les dessins publics
 
         Cursor cursor = db.rawQuery(query, null);
 
@@ -63,4 +61,5 @@ public class DessinsActivity extends AppCompatActivity {
 
         return dessinsList;
     }
+
 }

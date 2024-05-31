@@ -13,18 +13,11 @@
         android:text="Red" />
 
     <Button
-        android:id="@+id/colorGreen"
+        android:id="@+id/colorOrange"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/holo_green_light"
-        android:text="Green" />
-
-    <Button
-        android:id="@+id/colorBlue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/holo_blue_light"
-        android:text="Blue" />
+        android:backgroundTint="@android:color/holo_orange_dark"
+        android:text="Orange" />
 
     <Button
         android:id="@+id/colorYellow"
@@ -34,25 +27,32 @@
         android:text="Yellow" />
 
     <Button
+        android:id="@+id/colorGreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@android:color/holo_green_light"
+        android:text="Green" />
+
+    <Button
         android:id="@+id/colorPurple"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="@android:color/holo_purple"
         android:text="Purple" />
 
-
     <Button
-        android:id="@+id/colorMagenta"
+        android:id="@+id/colorBlue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/holo_red_dark"
-        android:text="Magenta" />
+        android:backgroundTint="@android:color/holo_blue_dark"
+        android:text="Blue" />
+
 
     <Button
-        android:id="@+id/colorOrange"
+        android:id="@+id/colorCyan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@android:color/holo_orange_dark"
-        android:text="Orange" />
+        android:backgroundTint="@android:color/holo_blue_light"
+        android:text="Cyan" />
 
 </LinearLayout>

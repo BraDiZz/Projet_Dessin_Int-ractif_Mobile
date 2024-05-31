@@ -14,10 +14,10 @@ import java.util.List;
 import android.view.View;
 
 public class DrawingView extends View {
+    private Bitmap backgroundBitmap; // Ajoutez cette variable pour l'arrière-plan
     private List<Circle> circles = new ArrayList<>();
     private List<Line> lines = new ArrayList<>();
     private List<PathWithPaint> paths = new ArrayList<>();
-
 
     private Path currentPath;
     private Paint currentPaint;
@@ -51,6 +51,11 @@ public class DrawingView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        // Dessiner le bitmap de fond si disponible
+        if (backgroundBitmap != null) {
+            canvas.drawBitmap(backgroundBitmap, 0, 0, null);
+        }
+
         for (Circle circle : circles) {
             circle.paint.setStyle(Paint.Style.FILL);
             canvas.drawCircle(circle.position.x, circle.position.y, circle.radius, circle.paint);
@@ -77,17 +82,23 @@ public class DrawingView extends View {
         }
     }
 
+    // Méthode pour définir le bitmap de fond
+    public void setBitmap(Bitmap bitmap) {
+        this.backgroundBitmap = bitmap;
+        invalidate(); // Redessiner la vue
+    }
+
     // Méthode pour activer le mode cercle
     public void setMode() {
-        if(isStraightLineMode==true) {
+        if(isStraightLineMode) {
             isCircleMode = false;
             isNormalMode = true;
             isStraightLineMode = false;
-        }else if(isNormalMode==true) {
+        } else if(isNormalMode) {
             isCircleMode = true;
             isNormalMode = false;
             isStraightLineMode = false;
-        }else if(isCircleMode==true) {
+        } else if(isCircleMode) {
             isCircleMode = false;
             isNormalMode = false;
             isStraightLineMode = true;
@@ -114,17 +125,17 @@ public class DrawingView extends View {
     }
 
     public void goBack() {
-        if(isStraightLineMode==true) {
+        if(isStraightLineMode) {
             if (!lines.isEmpty()) {
                 lines.remove(lines.size() - 1);
             }
         }
-        if(isCircleMode==true) {
+        if(isCircleMode) {
             if (!circles.isEmpty()) {
                 circles.remove(circles.size() - 1);
             }
         }
-        if(isNormalMode==true) {
+        if(isNormalMode) {
             if (!paths.isEmpty()) {
                 paths.remove(paths.size() - 1);
             }
@@ -147,7 +158,7 @@ public class DrawingView extends View {
                     startPoint = new PointF(x, y);
                     endPoint = startPoint;
                 } else if (isCircleMode) {
-                    circles.add(new Circle(new PointF(x, y), currentStrokeWidth*3+5, new Paint(currentPaint)));
+                    circles.add(new Circle(new PointF(x, y), currentStrokeWidth * 3 + 5, new Paint(currentPaint)));
                 } else {
                     currentPath.moveTo(x, y);
                 }
@@ -187,10 +198,6 @@ public class DrawingView extends View {
         invalidate();
     }
 
-    public void openColor(){
-
-    }
-
     private static class Line {
         PointF startPoint;
         PointF endPoint;
@@ -224,6 +231,7 @@ public class DrawingView extends View {
             this.paint = paint;
         }
     }
+
     public Bitmap getBitmap() {
         Bitmap bitmap = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);

@@ -22,6 +22,7 @@ import java.util.ArrayList;
 public class Creation_dessin extends AppCompatActivity {
 
     private BDD dbHelper;
+    int radio=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +73,13 @@ public class Creation_dessin extends AppCompatActivity {
             }
         });
 
+        radioPrivate.setOnClickListener(v -> {
+            radio = 2;
+        });
+        radioPublic.setOnClickListener(v -> {
+            radio = 1;
+        });
+
         btnCreate.setOnClickListener(v -> {
             int selectedId = radioGroup.getCheckedRadioButtonId();
             String dessinNom = champ_dessin.getText().toString().trim();
@@ -83,7 +91,7 @@ public class Creation_dessin extends AppCompatActivity {
                 } else {
                     int acc_id=dbHelper.getConnectedUserId();
 
-                    long id_dessin = dbHelper.createDessin(this,dessinNom, BDD.STATUT_PUBLIC,acc_id); // Utilisez l'ID utilisateur approp
+                    long id_dessin = dbHelper.createDessin(this,dessinNom,radio,acc_id); // Utilisez l'ID utilisateur approp
 
                     // Optionnel : Démarrer une nouvelle activité après la création du dessin
                     Intent intent = new Intent(this, ViewDrawingActivity.class);

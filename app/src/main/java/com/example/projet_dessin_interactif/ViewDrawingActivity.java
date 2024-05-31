@@ -21,8 +21,9 @@ public class ViewDrawingActivity extends AppCompatActivity {
     private DrawingView drawingView;
     private PopupWindow colorPopupWindow;
     private int mode=0;
-
     private long dessinId;
+    private int autorisation=0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +39,17 @@ public class ViewDrawingActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+
+        Bitmap dessinImage = dbHelper.getDessinImage(dessinId);
+
+        // Définir l'image dans la vue de dessin
+        if (dessinImage != null) {
+            drawingView.setBitmap(dessinImage);
+        } else {
+            Toast.makeText(this, "Erreur: Impossible de charger l'image du dessin", Toast.LENGTH_SHORT).show();
+        }
+
         colorButton.setOnClickListener(v -> showColorPopup(colorButton));
 
         SeekBar seekBar = findViewById(R.id.seekBar);
@@ -122,6 +134,24 @@ public class ViewDrawingActivity extends AppCompatActivity {
             Intent intent = new Intent(ViewDrawingActivity.this, HubActivity.class);
             startActivity(intent);
         });
+        saveButton.setBackgroundColor(Color.GREEN);
+        quitButton.setBackgroundColor(Color.RED);
+
+        // Vérifier si l'utilisateur est premium
+        int connectedUserId = BDD.getConnectedUserId();
+        if (connectedUserId != -1) {
+            int accountType = dbHelper.getTypeAccount();
+
+            if (accountType == BDD.ACCOUNT_TYPE_PREMIUM) {
+                Toast.makeText(this, "Vous êtes un utilisateur premium", Toast.LENGTH_SHORT).show();
+                autorisation=1;
+            } else {
+                Toast.makeText(this, "Vous êtes un utilisateur simple", Toast.LENGTH_SHORT).show();
+                autorisation=0;
+            }
+        } else {
+            Toast.makeText(this, "Utilisateur non connecté", Toast.LENGTH_SHORT).show();
+        }
 
     }
     private void showColorPopup(View anchorView) {
@@ -141,7 +171,7 @@ public class ViewDrawingActivity extends AppCompatActivity {
         Button colorBlue = colorMenuView.findViewById(R.id.colorBlue);
         Button colorYellow = colorMenuView.findViewById(R.id.colorYellow);
         Button colorPurple = colorMenuView.findViewById(R.id.colorPurple);
-        Button colorMagenta = colorMenuView.findViewById(R.id.colorMagenta);
+        Button colorCyan = colorMenuView.findViewById(R.id.colorCyan);
         Button colorOrange = colorMenuView.findViewById(R.id.colorOrange);
 
         colorRed.setOnClickListener(v -> setColor(Color.RED));
@@ -149,8 +179,9 @@ public class ViewDrawingActivity extends AppCompatActivity {
         colorBlue.setOnClickListener(v -> setColor(Color.BLUE));
         colorYellow.setOnClickListener(v -> setColor(Color.YELLOW));
         colorPurple.setOnClickListener(v -> setColor(Color.MAGENTA));
-        colorMagenta.setOnClickListener(v -> setColor(Color.MAGENTA));
+        colorCyan.setOnClickListener(v -> setColor(Color.CYAN));
         colorOrange.setOnClickListener(v -> setColor(Color.parseColor("#FFA500")));
+
     }
 
     private void setColor(int color) {
