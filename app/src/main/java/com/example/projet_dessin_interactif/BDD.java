@@ -30,7 +30,7 @@ public class BDD extends SQLiteOpenHelper {
     private static final int[] INITIAL_CREATEUR = {1,2,1};
 
     private static final String DATABASE_NAME = "DataBase";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 6;
 
     // Table names and columns
     public static final String TABLE_NAME = "utilisateurs";
@@ -92,6 +92,7 @@ public class BDD extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE);
         db.execSQL(CREATE_DESSIN_TABLE);
+        db.execSQL(CREATE_COLLABORATIONS_TABLE);
 
         // Insert initial data
         for (int i = 0; i < INITIAL_EMAILS.length; i++) {
@@ -102,13 +103,14 @@ public class BDD extends SQLiteOpenHelper {
             values.put(COLUMN_ACCOUNT_TYPE, INITIAL_ACCOUNT_TYPES[i]);
             db.insert(TABLE_NAME, null, values);
         }
-
+        Bitmap blankBitmap = createBlankBitmap(800, 600); // Définir la taille de l'image blanche
+        byte[] imageBytes = bitmapToBytes(blankBitmap);
         for (int i = 0; i < INITIAL_NOM.length; i++) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_DESSIN_NOM, INITIAL_NOM[i]);
             values.put(COLUMN_DESSIN_STATUT, INITIAL_STATUT[i]);
             values.put(COLUMN_CREATEUR_ID, INITIAL_CREATEUR[i]);
-            values.put(COLUMN_DESSIN_IMAGE, (byte[]) null);
+            values.put(COLUMN_DESSIN_IMAGE, imageBytes);
             db.insert(TABLE_DESSIN, null, values);
         }
     }
@@ -119,7 +121,10 @@ public class BDD extends SQLiteOpenHelper {
         values.put(COLUMN_DESSIN_NOM, nom);
         values.put(COLUMN_DESSIN_STATUT, statut);
         values.put(COLUMN_CREATEUR_ID, createurId);
-        values.put(COLUMN_DESSIN_IMAGE, (byte[]) null); // Convertir le bitmap en tableau de bytes
+
+        Bitmap blankBitmap = createBlankBitmap(800, 600); // Définir la taille de l'image blanche
+        byte[] imageBytes = bitmapToBytes(blankBitmap);
+        values.put(COLUMN_DESSIN_IMAGE, imageBytes); // Convertir le bitmap en tableau de bytes
 
         long id = db.insert(TABLE_DESSIN, null, values);
         db.close();
@@ -128,6 +133,24 @@ public class BDD extends SQLiteOpenHelper {
         }
 
         return id;
+    }
+
+    public boolean deleteDessin(long dessinId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int affectedRows = db.delete(TABLE_DESSIN, COLUMN_DESSIN_ID + " = ?", new String[]{String.valueOf(dessinId)});
+        db.close();
+        return affectedRows > 0;
+    }
+    private byte[] bitmapToBytes(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+    private Bitmap createBlankBitmap(int width, int height) {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE); // Remplir le bitmap avec la couleur blanche
+        return bitmap;
     }
 
     public boolean saveDessin(long dessinId, Bitmap image) {
@@ -346,6 +369,42 @@ public class BDD extends SQLiteOpenHelper {
         return image;
     }
 
+    public int getUserIdByPseudo(String pseudo) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        int userId = -1; // Par défaut, si l'utilisateur n'est pas trouvé, renvoyer -1
+
+        try {
+            // Requête pour sélectionner l'ID de l'utilisateur avec le pseudo donné
+            String query = "SELECT " + COLUMN_ID +
+                    " FROM " + TABLE_NAME +
+                    " WHERE " + COLUMN_PSEUDO + " = ?";
+            Cursor cursor = db.rawQuery(query, new String[]{pseudo});
+
+            // Vérifier si le curseur contient des données
+            if (cursor != null && cursor.moveToFirst()) {
+                // Récupérer l'ID de l'utilisateur
+                userId = cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Journaliser l'exception pour le débogage
+        } finally {
+            db.close(); // Fermer la connexion à la base de données
+        }
+
+        return userId;
+    }
+
+    public boolean addCollaboratorToDessin(long dessinId, int collaboratorId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_ID, collaboratorId);
+        values.put(COLUMN_DESSIN_C_ID, dessinId);
+
+        long result = db.insert(TABLE_COLLABORATIONS, null, values);
+        db.close();
+
+        return result != -1;
+    }
 
 
 }

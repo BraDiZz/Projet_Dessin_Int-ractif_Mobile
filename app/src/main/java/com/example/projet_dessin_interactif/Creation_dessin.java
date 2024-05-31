@@ -48,8 +48,9 @@ public class Creation_dessin extends AppCompatActivity {
 
         // Initialisation de la liste pour le Spinner
         ArrayList<String> collaborateursList = new ArrayList<>();
-        collaborateursList.add("Collaborateur 1");
-        collaborateursList.add("Collaborateur 2");
+
+        ArrayList<Integer> collab_id = new ArrayList<>();
+
 
         // Créez l'ArrayAdapter avec la liste
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
@@ -64,12 +65,21 @@ public class Creation_dessin extends AppCompatActivity {
         btnAjouter.setOnClickListener(v -> {
             String newName = adresse_collaborateurs.getText().toString().trim();
             if (!newName.isEmpty()) {
-                collaborateursList.add(newName);  // Ajouter à la liste
-                adapter.notifyDataSetChanged();  // Mettre à jour le Spinner
-                Toast.makeText(this, "Ajouté : " + newName, Toast.LENGTH_SHORT).show();
-                adresse_collaborateurs.setText("");  // Effacer le champ
-            } else {
-                Toast.makeText(this, "Entrez un nom valide", Toast.LENGTH_SHORT).show();
+                int val = dbHelper.getUserIdByPseudo(newName);
+                if(val!=-1 && val!= dbHelper.getConnectedUserId()){
+                    collab_id.add(val);
+                    collaborateursList.add(newName);  // Ajouter à la liste
+                    adapter.notifyDataSetChanged();  // Mettre à jour le Spinner
+                    Toast.makeText(this, "Ajouté : " + newName, Toast.LENGTH_SHORT).show();
+                    adresse_collaborateurs.setText("");  // Effacer le champ
+                }else{
+                    if(val==-1){
+                        Toast.makeText(this, "Ce pseudo n'existe pas", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(this, "Vous ne pouvez pas vous ajoutez vous meme", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
             }
         });
 
@@ -93,7 +103,11 @@ public class Creation_dessin extends AppCompatActivity {
 
                     long id_dessin = dbHelper.createDessin(this,dessinNom,radio,acc_id); // Utilisez l'ID utilisateur approp
 
-                    // Optionnel : Démarrer une nouvelle activité après la création du dessin
+                    for(int i=0;i<collab_id.size();i++){
+                        dbHelper.addCollaboratorToDessin(id_dessin, collab_id.get(i));
+                    }
+
+
                     Intent intent = new Intent(this, ViewDrawingActivity.class);
                     intent.putExtra("dessin_id", id_dessin);
                     startActivity(intent);

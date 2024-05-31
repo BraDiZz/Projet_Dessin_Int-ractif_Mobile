@@ -1,6 +1,8 @@
 package com.example.projet_dessin_interactif;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
@@ -9,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,13 +30,14 @@ public class DessinAdapter extends RecyclerView.Adapter<DessinAdapter.DessinView
         this.c=context;
     }
 
-    // ViewHolder pour les dessins
     public class DessinViewHolder extends RecyclerView.ViewHolder {
         TextView nomTextView;
         TextView auteurTextView;
         long id_img;
+        boolean owner;
         ImageView imageView;
         Button modifierButton;
+        Button supprimerButton;
 
         public DessinViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -41,10 +45,11 @@ public class DessinAdapter extends RecyclerView.Adapter<DessinAdapter.DessinView
             auteurTextView = itemView.findViewById(R.id.auteurTextView);
             imageView = itemView.findViewById(R.id.imageView);
             modifierButton = itemView.findViewById(R.id.modifierButton);
+            supprimerButton = itemView.findViewById(R.id.supprimerButton);
         }
     }
 
-    // Méthode pour créer de nouveaux ViewHolder
+
     @NonNull
     @Override
     public DessinViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -52,13 +57,14 @@ public class DessinAdapter extends RecyclerView.Adapter<DessinAdapter.DessinView
         return new DessinViewHolder(view);
     }
 
-    // Méthode pour lier les données à chaque ViewHolder
+
     @Override
     public void onBindViewHolder(@NonNull DessinViewHolder holder, int position) {
         DessinModel dessin = dessinsList.get(position);
         holder.nomTextView.setText(dessin.getNom());
         holder.auteurTextView.setText(dessin.getAuteur());
         holder.id_img = dessin.getDessinId();
+        holder.owner = dessin.getstatus();
         // Charger l'image depuis le tableau de bytes dans dessin.getImageBytes() et l'afficher dans imageView
         byte[] imageBytes = dessin.getImageBytes();
         if (imageBytes != null) {
@@ -74,6 +80,38 @@ public class DessinAdapter extends RecyclerView.Adapter<DessinAdapter.DessinView
                 c.startActivity(intent);
             }
         });
+
+        if(holder.owner){
+            holder.supprimerButton.setVisibility(View.VISIBLE);
+        }else{
+            holder.supprimerButton.setVisibility(View.INVISIBLE);
+        }
+        holder.supprimerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(c)
+                        .setTitle("Confirmer la suppression")
+                        .setMessage("Êtes-vous sûr de vouloir supprimer ce dessin?")
+                        .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Code pour supprimer le dessin
+                                BDD bdd = new BDD(c);
+                                boolean deleted = bdd.deleteDessin(holder.id_img);
+                                if (deleted) {
+                                    dessinsList.remove(position);
+                                    notifyItemRemoved(position);
+                                    notifyItemRangeChanged(position, dessinsList.size());
+                                } else {
+                                    Toast.makeText(c, "Échec de la suppression du dessin", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton("Non", null)
+                        .show();
+            }
+        });
+
+
     }
 
     // Méthode pour obtenir le nombre total d'éléments dans la liste

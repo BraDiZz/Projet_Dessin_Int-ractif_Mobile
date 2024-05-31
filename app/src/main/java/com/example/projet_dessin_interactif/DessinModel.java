@@ -7,11 +7,14 @@ public class DessinModel {
 
     private long dessin_id;
 
-    public DessinModel(String titre, String auteur, byte[] imageBytes,long id) {
+    private boolean owner;
+
+    public DessinModel(String titre, String auteur, byte[] imageBytes,long id,boolean owner) {
         this.titre = titre;
         this.auteur = auteur;
         this.imageBytes = imageBytes;
         this.dessin_id=id;
+        this.owner=owner;
     }
 
     public String getNom() {
@@ -27,5 +30,7 @@ public class DessinModel {
     }
 
     public long getDessinId(){ return dessin_id;}
+
+    public boolean getstatus(){return owner;}
 }
 

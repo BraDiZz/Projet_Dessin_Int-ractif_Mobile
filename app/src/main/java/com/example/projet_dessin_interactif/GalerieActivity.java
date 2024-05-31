@@ -52,7 +52,7 @@ public class GalerieActivity extends AppCompatActivity {
                 long acc_id = cursor.getLong(cursor.getColumnIndex(BDD.COLUMN_DESSIN_ID));
                 byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(BDD.COLUMN_DESSIN_IMAGE)); // Récupérer l'image en BLOB
 
-                dessinsList.add(new DessinModel(nomDessin, auteur, imageBytes,acc_id));
+                dessinsList.add(new DessinModel(nomDessin, auteur, imageBytes,acc_id,true));
             } while (cursor.moveToNext());
             cursor.close(); // Fermer le curseur après utilisation
         }

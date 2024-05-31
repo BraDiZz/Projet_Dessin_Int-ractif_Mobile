@@ -51,7 +51,7 @@ public class GalerieActivity_prenium extends AppCompatActivity {
                 String auteur = cursor.getString(cursor.getColumnIndex(BDD.COLUMN_PSEUDO));
                 byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(BDD.COLUMN_DESSIN_IMAGE)); // Récupérer l'image en BLOB
                 long acc_id = cursor.getLong(cursor.getColumnIndex(BDD.COLUMN_DESSIN_ID));
-                dessinsList.add(new DessinModel(nomDessin, auteur, imageBytes,acc_id));
+                dessinsList.add(new DessinModel(nomDessin, auteur, imageBytes,acc_id,true));
             } while (cursor.moveToNext());
             cursor.close(); // Fermer le curseur après utilisation
         }

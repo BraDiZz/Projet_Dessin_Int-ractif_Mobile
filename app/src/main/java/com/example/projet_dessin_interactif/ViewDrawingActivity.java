@@ -92,12 +92,6 @@ public class ViewDrawingActivity extends AppCompatActivity {
             drawingView.goBack();
         });
 
-
-
-
-
-
-        // Configurer le bouton "clear"
         Button clearButton = findViewById(R.id.clearButton);
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,20 +101,15 @@ public class ViewDrawingActivity extends AppCompatActivity {
         });
 
 
-
-        // Configurer le bouton "save"
         Button saveButton = findViewById(R.id.saveButton);
         saveButton.setOnClickListener(v -> {
-            // Obtenir le bitmap du dessin actuel
             Bitmap currentDrawing = drawingView.getBitmap();
 
-            // Vérifier si le bitmap est null (aucun dessin)
             if (currentDrawing == null) {
                 Toast.makeText(ViewDrawingActivity.this, "Aucun dessin à sauvegarder", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Enregistrer le dessin dans la base de données
             boolean success = dbHelper.saveDessin(dessinId, currentDrawing);
             if (success) {
                 Toast.makeText(ViewDrawingActivity.this, "Dessin sauvegardé", Toast.LENGTH_SHORT).show();
@@ -137,18 +126,17 @@ public class ViewDrawingActivity extends AppCompatActivity {
         saveButton.setBackgroundColor(Color.GREEN);
         quitButton.setBackgroundColor(Color.RED);
 
-        // Vérifier si l'utilisateur est premium
         int connectedUserId = BDD.getConnectedUserId();
         if (connectedUserId != -1) {
             int accountType = dbHelper.getTypeAccount();
-
+            /*
             if (accountType == BDD.ACCOUNT_TYPE_PREMIUM) {
                 Toast.makeText(this, "Vous êtes un utilisateur premium", Toast.LENGTH_SHORT).show();
                 autorisation=1;
             } else {
                 Toast.makeText(this, "Vous êtes un utilisateur simple", Toast.LENGTH_SHORT).show();
                 autorisation=0;
-            }
+            }*/
         } else {
             Toast.makeText(this, "Utilisateur non connecté", Toast.LENGTH_SHORT).show();
         }
@@ -163,7 +151,6 @@ public class ViewDrawingActivity extends AppCompatActivity {
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 true);
 
-        // Afficher la popup juste en dessous du bouton
         colorPopupWindow.showAsDropDown(anchorView, 0, 0);
 
         Button colorRed = colorMenuView.findViewById(R.id.colorRed);

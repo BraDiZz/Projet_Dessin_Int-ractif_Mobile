@@ -27,34 +27,29 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login); // Charge le layout de LoginActivity
+        setContentView(R.layout.activity_login);
 
-        // Récupérer les références des champs de texte
+
         emailInput = findViewById(R.id.email_input);
         passwordInput = findViewById(R.id.password_input);
 
         btnInscription = findViewById(R.id.btn_inscription);
 
-        // Initialiser la base de données
+
         database = new BDD(this);
 
-        // Récupérer la référence du bouton
         Button loginButton = findViewById(R.id.buttonValider);
 
-        // Ajouter un écouteur d'événements au bouton
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Récupérer les valeurs entrées
                 String email = emailInput.getText().toString();
                 String password = passwordInput.getText().toString();
 
-                // Vérifier si les champs sont vides
+
                 if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                    // Afficher un message si un champ est vide
                     Toast.makeText(LoginActivity.this, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Tous les champs sont remplis, procéder à la vérification dans la base de données
                     int acc = database.checkLogin(LoginActivity.this,email, password);
                     if (acc == 0) {
                         Intent intent = new Intent(LoginActivity.this, HubActivity.class);

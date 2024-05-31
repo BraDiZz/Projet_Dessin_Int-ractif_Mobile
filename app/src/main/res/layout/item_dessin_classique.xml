@@ -7,14 +7,16 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="match_parent"
+        android:layout_width="200dp"
         android:layout_height="200dp"
         android:scaleType="centerCrop"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/auteurTextView" />
 
+    <!-- TextView for displaying "Auteur :" label -->
     <TextView
         android:id="@+id/auteurTextView"
         android:layout_width="wrap_content"
@@ -25,8 +27,9 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"/>
+        android:layout_marginTop="8dp" />
 
+    <!-- TextView for displaying the author's name -->
     <TextView
         android:id="@+id/auteurValueTextView"
         android:layout_width="wrap_content"
@@ -35,8 +38,9 @@
         app:layout_constraintTop_toBottomOf="@+id/auteurTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"/>
+        android:layout_marginTop="8dp" />
 
+    <!-- TextView for displaying "Titre :" label -->
     <TextView
         android:id="@+id/titreTextView"
         android:layout_width="wrap_content"
@@ -47,9 +51,9 @@
         app:layout_constraintTop_toBottomOf="@+id/auteurValueTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="8dp" />
 
+    <!-- TextView for displaying the title -->
     <TextView
         android:id="@+id/titreValueTextView"
         android:layout_width="wrap_content"
@@ -58,7 +62,7 @@
         app:layout_constraintTop_toBottomOf="@+id/titreTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"/>
+        android:layout_marginTop="8dp" />
 
 
 
