@@ -13,22 +13,32 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/CircleModeButton"
+            android:id="@+id/ModeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mode Cercle" />
+            android:text="Mode Libre" />
 
         <Button
-            android:id="@+id/NormalModeButton"
+            android:id="@+id/colorButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mode Normal" />
+            android:text="Colors"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
+
 
         <Button
-            android:id="@+id/LineModeButton"
+            android:id="@+id/ReturnButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mode Ligne Droite" />
+            android:text="Return" />
+
+        <Button
+            android:id="@+id/quitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="Quit" />
     </LinearLayout>
 
     <com.example.projet_dessin_interactif.DrawingView
@@ -70,7 +80,9 @@
             android:layout_height="wrap_content"
             android:text="Save"
             android:layout_alignParentEnd="true"/>
+
     </RelativeLayout>
+
 
 </RelativeLayout>
 

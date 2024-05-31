@@ -1,25 +1,34 @@
 package com.example.projet_dessin_interactif;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
-import android.content.Intent;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.util.ArrayList;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
 public class Creation_dessin extends AppCompatActivity {
+
+    private BDD dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_creation_dessin);  // Charger le layout associé
+
+        dbHelper = new BDD(this);
 
         // Références aux éléments de l'activité
         TextView nom_du_dessin = findViewById(R.id.nom_du_dessin);
@@ -32,9 +41,9 @@ public class Creation_dessin extends AppCompatActivity {
         Button btnAjouter = findViewById(R.id.btn_ajouter);
         Button btnCreate = findViewById(R.id.btn_create);
 
-        //int selectedId = radioGroup.getCheckedRadioButtonId();
-
-
+        RadioGroup radioGroup = findViewById(R.id.radio_group);
+        RadioButton radioPublic = findViewById(R.id.radio_public);
+        RadioButton radioPrivate = findViewById(R.id.radio_prive);
 
         // Initialisation de la liste pour le Spinner
         ArrayList<String> collaborateursList = new ArrayList<>();
@@ -51,7 +60,6 @@ public class Creation_dessin extends AppCompatActivity {
 
         collaborateursSpinner.setAdapter(adapter);
 
-
         btnAjouter.setOnClickListener(v -> {
             String newName = adresse_collaborateurs.getText().toString().trim();
             if (!newName.isEmpty()) {
@@ -65,8 +73,27 @@ public class Creation_dessin extends AppCompatActivity {
         });
 
         btnCreate.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ViewDrawingActivity.class); // Classe du canvas
-            startActivity(intent); // Démarrer l'activité du dessin
+            int selectedId = radioGroup.getCheckedRadioButtonId();
+            String dessinNom = champ_dessin.getText().toString().trim();
+            if (!dessinNom.isEmpty()) {
+
+                if (selectedId == -1) {
+                    // Aucun bouton radio n'est sélectionné
+                    Toast.makeText(this, "Veuillez sélectionner la disponibilité de votre salon", Toast.LENGTH_SHORT).show();
+                } else {
+                    int acc_id=dbHelper.getConnectedUserId();
+
+                    long id_dessin = dbHelper.createDessin(this,dessinNom, BDD.STATUT_PUBLIC,acc_id); // Utilisez l'ID utilisateur approp
+
+                    // Optionnel : Démarrer une nouvelle activité après la création du dessin
+                    Intent intent = new Intent(this, ViewDrawingActivity.class);
+                    intent.putExtra("dessin_id", id_dessin);
+                    startActivity(intent);
+                }
+
+            } else {
+                Toast.makeText(this, "Entrez un nom de dessin valide", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

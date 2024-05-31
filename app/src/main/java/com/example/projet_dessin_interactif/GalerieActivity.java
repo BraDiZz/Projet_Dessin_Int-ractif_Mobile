@@ -3,49 +3,45 @@ package com.example.projet_dessin_interactif;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.widget.TextView;
-
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GalerieActivity extends AppCompatActivity {
 
-    private BDD dbHelper; // Instance de votre classe BDD pour accéder à la base de données
+    private BDD dbHelper;
+    private RecyclerView recyclerView;
+    private DessinAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_galerie);
 
-        // Récupérer la référence à la TextView pour afficher les dessins
-        TextView Titre = findViewById(R.id.recyclerView);
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Récupérer les données des dessins depuis la base de données
-        dbHelper = new BDD(this); // Initialiser votre classe BDD
-        List<String> dessins = getDessins(); // Méthode pour récupérer les dessins depuis la base de données
-
-        // Construire le texte à afficher
-        StringBuilder dessinsText = new StringBuilder();
-        for (String dessin : dessins) {
-            dessinsText.append(dessin).append("\n"); // Ajouter chaque dessin à la chaîne de texte
-        }
-
-        // Afficher les dessins dans la TextView
-        Titre.setText(dessinsText.toString());
+        dbHelper = new BDD(this);
+        List<DessinModel> dessinsList = getDessins();
+        adapter = new DessinAdapter(dessinsList); // Appeler le constructeur avec un seul paramètre
+        recyclerView.setAdapter(adapter);
     }
 
+
     // Méthode pour récupérer les dessins depuis la base de données
-    private List<String> getDessins() {
-        List<String> dessinsList = new ArrayList<>();
+    private List<DessinModel> getDessins() {
+        List<DessinModel> dessinsList = new ArrayList<>();
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        String query = "SELECT " + BDD.COLUMN_DESSIN_NOM + ", " + BDD.COLUMN_PSEUDO +
+        String query = "SELECT " + BDD.COLUMN_DESSIN_NOM + ", " + BDD.COLUMN_PSEUDO + ", " + BDD.COLUMN_DESSIN_IMAGE +
                 " FROM " + BDD.TABLE_DESSIN + " INNER JOIN " + BDD.TABLE_NAME +
                 " ON " + BDD.TABLE_DESSIN + "." + BDD.COLUMN_CREATEUR_ID + " = " +
-                BDD.TABLE_NAME + "." + BDD.COLUMN_ID;
+                BDD.TABLE_NAME + "." + BDD.COLUMN_ID +
+                " WHERE " + BDD.COLUMN_DESSIN_STATUT + " = 1"; // Utilisation de l'entier 1 pour les dessins publics
 
         Cursor cursor = db.rawQuery(query, null);
 
@@ -53,8 +49,8 @@ public class GalerieActivity extends AppCompatActivity {
             do {
                 String nomDessin = cursor.getString(cursor.getColumnIndex(BDD.COLUMN_DESSIN_NOM));
                 String auteur = cursor.getString(cursor.getColumnIndex(BDD.COLUMN_PSEUDO));
-                String dessinInfo = nomDessin + " - " + auteur;
-                dessinsList.add(dessinInfo);
+                byte[] imageBytes = cursor.getBlob(cursor.getColumnIndex(BDD.COLUMN_DESSIN_IMAGE)); // Récupérer l'image en BLOB
+                dessinsList.add(new DessinModel(nomDessin, auteur, imageBytes));
             } while (cursor.moveToNext());
             cursor.close(); // Fermer le curseur après utilisation
         }
@@ -64,4 +60,5 @@ public class GalerieActivity extends AppCompatActivity {
 
         return dessinsList;
     }
+
 }

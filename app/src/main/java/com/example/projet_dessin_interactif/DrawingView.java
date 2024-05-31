@@ -1,6 +1,7 @@
 package com.example.projet_dessin_interactif;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -77,10 +78,20 @@ public class DrawingView extends View {
     }
 
     // Méthode pour activer le mode cercle
-    public void setCircleMode() {
-        isCircleMode = true;
-        isNormalMode = false;
-        isStraightLineMode = false;
+    public void setMode() {
+        if(isStraightLineMode==true) {
+            isCircleMode = false;
+            isNormalMode = true;
+            isStraightLineMode = false;
+        }else if(isNormalMode==true) {
+            isCircleMode = true;
+            isNormalMode = false;
+            isStraightLineMode = false;
+        }else if(isCircleMode==true) {
+            isCircleMode = false;
+            isNormalMode = false;
+            isStraightLineMode = true;
+        }
     }
 
     // Méthode pour activer le mode normal
@@ -102,6 +113,29 @@ public class DrawingView extends View {
         currentPaint.setStrokeWidth(strokeWidth);
     }
 
+    public void goBack() {
+        if(isStraightLineMode==true) {
+            if (!lines.isEmpty()) {
+                lines.remove(lines.size() - 1);
+            }
+        }
+        if(isCircleMode==true) {
+            if (!circles.isEmpty()) {
+                circles.remove(circles.size() - 1);
+            }
+        }
+        if(isNormalMode==true) {
+            if (!paths.isEmpty()) {
+                paths.remove(paths.size() - 1);
+            }
+        }
+        invalidate();
+    }
+
+    public void setCurrentColor(int color) {
+        currentPaint.setColor(color);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -113,7 +147,7 @@ public class DrawingView extends View {
                     startPoint = new PointF(x, y);
                     endPoint = startPoint;
                 } else if (isCircleMode) {
-                    circles.add(new Circle(new PointF(x, y), currentStrokeWidth+10, new Paint(currentPaint)));
+                    circles.add(new Circle(new PointF(x, y), currentStrokeWidth*3+5, new Paint(currentPaint)));
                 } else {
                     currentPath.moveTo(x, y);
                 }
@@ -153,6 +187,10 @@ public class DrawingView extends View {
         invalidate();
     }
 
+    public void openColor(){
+
+    }
+
     private static class Line {
         PointF startPoint;
         PointF endPoint;
@@ -185,5 +223,11 @@ public class DrawingView extends View {
             this.radius = radius;
             this.paint = paint;
         }
+    }
+    public Bitmap getBitmap() {
+        Bitmap bitmap = Bitmap.createBitmap(this.getWidth(), this.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        this.draw(canvas);
+        return bitmap;
     }
 }

@@ -55,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "Veuillez remplir tous les champs", Toast.LENGTH_SHORT).show();
                 } else {
                     // Tous les champs sont remplis, procéder à la vérification dans la base de données
-                    int acc = database.checkLogin(email, password);
+                    int acc = database.checkLogin(LoginActivity.this,email, password);
                     if (acc == 0) {
                         Intent intent = new Intent(LoginActivity.this, HubActivity.class);
                         startActivity(intent);

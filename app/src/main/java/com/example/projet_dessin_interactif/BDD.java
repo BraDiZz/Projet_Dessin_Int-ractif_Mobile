@@ -1,48 +1,55 @@
 package com.example.projet_dessin_interactif;
 
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.widget.Toast;
+import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BDD extends SQLiteOpenHelper {
+    private static int connected = -1;
 
     private static final String[] INITIAL_EMAILS = {"benjamin.serva34@gmail.com", "delvigne.brian@gmail.com"};
     private static final String[] INITIAL_PSEUDOS = {"ben", "brian"};
     private static final String[] INITIAL_PASSWORDS = {"test", "test2"};
-    private static final int[] INITIAL_ACCOUNT_TYPES = {BDD.ACCOUNT_TYPE_SIMPLE, BDD.ACCOUNT_TYPE_SIMPLE};
+    private static final int[] INITIAL_ACCOUNT_TYPES = {BDD.ACCOUNT_TYPE_PREMIUM, BDD.ACCOUNT_TYPE_SIMPLE};
 
-    private static final String[] INITIAL_NOM = {"dessin1", "dessin2"};
-    private static final int[] INITIAL_STATUT = {BDD.STATUT_PUBLIC, BDD.STATUT_PRIVEE};
+    private static final String[] INITIAL_NOM = {"dessin1", "dessin2","dessin3"};
+    private static final int[] INITIAL_STATUT = {BDD.STATUT_PUBLIC, BDD.STATUT_PUBLIC, BDD.STATUT_PRIVEE};
+
+    private static final int[] INITIAL_CREATEUR = {1,2,1};
 
     private static final String DATABASE_NAME = "DataBase";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
-    // Table name
+    // Table names and columns
     public static final String TABLE_NAME = "utilisateurs";
-
-    // Table columns
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_PSEUDO = "pseudo";
     public static final String COLUMN_PASSWORD = "password";
     public static final String COLUMN_ACCOUNT_TYPE = "account_type";
-
-    // Account types
-    public static final int ACCOUNT_TYPE_SIMPLE = 1;
-    public static final int ACCOUNT_TYPE_PREMIUM = 2;
-
     public static final String TABLE_DESSIN = "dessin";
     public static final String COLUMN_DESSIN_ID = "dessin_id";
     public static final String COLUMN_DESSIN_NOM = "nom";
     public static final String COLUMN_DESSIN_STATUT = "statut";
-
+    public static final String COLUMN_CREATEUR_ID = "createur_id";
+    public static final int ACCOUNT_TYPE_SIMPLE = 1;
+    public static final int ACCOUNT_TYPE_PREMIUM = 2;
     public static final int STATUT_PUBLIC = 1;
     public static final int STATUT_PRIVEE = 2;
 
-    // Create table SQL query
+    // SQL queries for creating tables
     private static final String CREATE_TABLE =
             "CREATE TABLE " + TABLE_NAME + "("
                     + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -51,21 +58,16 @@ public class BDD extends SQLiteOpenHelper {
                     + COLUMN_PASSWORD + " TEXT,"
                     + COLUMN_ACCOUNT_TYPE + " INTEGER"
                     + ")";
-
-
-    public static final String COLUMN_CREATEUR_ID = "createur_id";
-
+    public static final String COLUMN_DESSIN_IMAGE = "image";
     private static final String CREATE_DESSIN_TABLE =
             "CREATE TABLE " + TABLE_DESSIN + "("
                     + COLUMN_DESSIN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                     + COLUMN_DESSIN_NOM + " TEXT,"
                     + COLUMN_DESSIN_STATUT + " INTEGER,"
+                    + COLUMN_DESSIN_IMAGE + " BLOB,"
                     + COLUMN_CREATEUR_ID + " INTEGER,"
                     + "FOREIGN KEY(" + COLUMN_CREATEUR_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + ")"
                     + ")";
-
-
-
 
     // Constantes pour la table de jointure collaborations
     public static final String TABLE_COLLABORATIONS = "collaborations";
@@ -82,10 +84,6 @@ public class BDD extends SQLiteOpenHelper {
                     + "FOREIGN KEY(" + COLUMN_USER_ID + ") REFERENCES " + TABLE_NAME + "(" + COLUMN_ID + "),"
                     + "FOREIGN KEY(" + COLUMN_DESSIN_C_ID + ") REFERENCES " + TABLE_DESSIN + "(" + COLUMN_DESSIN_C_ID + ")"
                     + ")";
-
-
-
-
     public BDD(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -94,48 +92,68 @@ public class BDD extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE);
         db.execSQL(CREATE_DESSIN_TABLE);
+
+        // Insert initial data
         for (int i = 0; i < INITIAL_EMAILS.length; i++) {
-            ContentValues values = new ContentValues(); // Créer une nouvelle instance à chaque itération
+            ContentValues values = new ContentValues();
             values.put(COLUMN_EMAIL, INITIAL_EMAILS[i]);
             values.put(COLUMN_PSEUDO, INITIAL_PSEUDOS[i]);
             values.put(COLUMN_PASSWORD, INITIAL_PASSWORDS[i]);
             values.put(COLUMN_ACCOUNT_TYPE, INITIAL_ACCOUNT_TYPES[i]);
             db.insert(TABLE_NAME, null, values);
         }
+
         for (int i = 0; i < INITIAL_NOM.length; i++) {
             ContentValues values = new ContentValues();
             values.put(COLUMN_DESSIN_NOM, INITIAL_NOM[i]);
             values.put(COLUMN_DESSIN_STATUT, INITIAL_STATUT[i]);
+            values.put(COLUMN_CREATEUR_ID, INITIAL_CREATEUR[i]);
+            values.put(COLUMN_DESSIN_IMAGE, (byte[]) null);
             db.insert(TABLE_DESSIN, null, values);
         }
+    }
 
-        ContentValues dessinValues1 = new ContentValues();
-        dessinValues1.put(COLUMN_DESSIN_NOM, INITIAL_NOM[0]);
-        dessinValues1.put(COLUMN_DESSIN_STATUT, INITIAL_STATUT[0]);
-        dessinValues1.put(COLUMN_CREATEUR_ID, 1); // ID de l'utilisateur "ben"
-        db.insert(TABLE_DESSIN, null, dessinValues1);
+    public long createDessin(Context context, String nom, int statut, int createurId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_DESSIN_NOM, nom);
+        values.put(COLUMN_DESSIN_STATUT, statut);
+        values.put(COLUMN_CREATEUR_ID, createurId);
+        values.put(COLUMN_DESSIN_IMAGE, (byte[]) null); // Convertir le bitmap en tableau de bytes
 
-        ContentValues dessinValues2 = new ContentValues();
-        dessinValues2.put(COLUMN_DESSIN_NOM, INITIAL_NOM[1]);
-        dessinValues2.put(COLUMN_DESSIN_STATUT, INITIAL_STATUT[1]);
-        dessinValues2.put(COLUMN_CREATEUR_ID, 2); // ID de l'utilisateur "brian"
-        db.insert(TABLE_DESSIN, null, dessinValues2);
+        long id = db.insert(TABLE_DESSIN, null, values);
+        db.close();
+        if (id == -1) {
+            Toast.makeText(context, "id du dessin non chargé", Toast.LENGTH_SHORT).show();
+        }
 
+        return id;
+    }
 
+    public boolean saveDessin(long dessinId, Bitmap image) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_DESSIN_IMAGE, getBitmapAsByteArray(image)); // Convertir le bitmap en tableau de bytes
+
+        int affectedRows = db.update(TABLE_DESSIN, values, COLUMN_DESSIN_ID + " = ?", new String[]{String.valueOf(dessinId)});
+        db.close();
+        return affectedRows > 0;
+    }
+    private byte[] getBitmapAsByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputStream);
+        return outputStream.toByteArray();
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_DESSIN);
-
-        // Create tables again
         onCreate(db);
     }
 
-    public int checkLogin(String email, String password) {
+    public int checkLogin(Context context,String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         // Requête pour sélectionner l'utilisateur avec l'email donné
@@ -148,7 +166,11 @@ public class BDD extends SQLiteOpenHelper {
             String storedPassword = cursor.getString(cursor.getColumnIndex(COLUMN_PASSWORD));
             if (password.equals(storedPassword)) {
                 // Le mot de passe correspond, connexion réussie
+                connected=cursor.getInt(cursor.getColumnIndex(COLUMN_ID));
                 cursor.close();
+
+                //Toast.makeText(context, "Connected user ID: " + connected, Toast.LENGTH_LONG).show();
+
                 return 0; // Aucune erreur
             } else {
                 // Le mot de passe ne correspond pas
@@ -162,6 +184,43 @@ public class BDD extends SQLiteOpenHelper {
             }
             return 2;
         }
+    }
+    public static int getConnectedUserId() {
+        // Utiliser l'attribut connected pour obtenir l'ID de l'utilisateur connecté
+        return connected;
+    }
+
+    public static void deconnexion(){
+        connected = -1;
+    }
+
+    public List<String> getDessinsUtilisateur(int userId) {
+        List<String> dessinsList = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + COLUMN_DESSIN_NOM +
+                " FROM " + TABLE_DESSIN +
+                " WHERE " + COLUMN_CREATEUR_ID + " = " + userId;
+
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    String nomDessin = cursor.getString(cursor.getColumnIndex(COLUMN_DESSIN_NOM));
+                    dessinsList.add(nomDessin);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception for debugging
+        } finally {
+            if (cursor != null) {
+                cursor.close(); // Fermer le curseur après utilisation
+            }
+            db.close(); // Fermer la connexion à la base de données
+        }
+
+        return dessinsList;
     }
 
     public boolean registerUser(String email, String pseudo, String password, int accountType) {
@@ -195,6 +254,4 @@ public class BDD extends SQLiteOpenHelper {
         return result!=-1;
     }
 
-    // CRUD operations methods go here
 }
-
