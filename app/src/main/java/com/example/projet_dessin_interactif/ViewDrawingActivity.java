@@ -129,14 +129,14 @@ public class ViewDrawingActivity extends AppCompatActivity {
         int connectedUserId = BDD.getConnectedUserId();
         if (connectedUserId != -1) {
             int accountType = dbHelper.getTypeAccount();
-            /*
+
             if (accountType == BDD.ACCOUNT_TYPE_PREMIUM) {
-                Toast.makeText(this, "Vous êtes un utilisateur premium", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Vous êtes un utilisateur premium", Toast.LENGTH_SHORT).show();
                 autorisation=1;
             } else {
-                Toast.makeText(this, "Vous êtes un utilisateur simple", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Vous êtes un utilisateur simple", Toast.LENGTH_SHORT).show();
                 autorisation=0;
-            }*/
+            }
         } else {
             Toast.makeText(this, "Utilisateur non connecté", Toast.LENGTH_SHORT).show();
         }
